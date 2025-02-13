@@ -1,0 +1,41 @@
+﻿<Window x:Class="MyChat.App.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MyChat.App" 
+        xmlns:views="clr-namespace:MyChat.App.Views"
+        xmlns:viewModels="clr-namespace:MyChat.App.ViewModel"
+        mc:Ignorable="d"
+        Title="MainView"
+        Height="720"
+        Width="1280"
+        MinHeight="720"
+        MinWidth="1280">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+            
+        <Grid.Resources>
+            <DataTemplate DataType="{x:Type viewModels:UserListViewModel}">
+                <views:UserListView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:UserViewModel}">
+                <views:UserView />
+            </DataTemplate>
+        </Grid.Resources>
+        
+        <ContentControl 
+            Content="{Binding CurrentViewModel}"
+            Grid.Column="1"/>
+        
+        <Button 
+            x:Name="ConnectButton"
+            Command="{Binding ConnectCommand}"
+            Content="Connect"
+            Width="200"
+            Height="50" VerticalAlignment="Top"/>
+    </Grid>
+</Window>
