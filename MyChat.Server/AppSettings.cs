@@ -1,6 +1,7 @@
 ﻿namespace MyChat.Server
 { 
     using Microsoft.Extensions.Configuration;
+    using System.Runtime.CompilerServices;
 
     public class AppSettings
     {
@@ -31,6 +32,11 @@
             {
                 return null;
             }
+        }
+
+        public static string? GetConnectionString(string name)
+        {
+            return Configuration.GetConnectionString(name);
         }
     }
 }

@@ -6,19 +6,27 @@
     using System.Text.Json;
     using Microsoft.Extensions.Logging;
     using MyChat.Core;
-    using Microsoft.Extensions.Configuration;
+    using MyChat.App.DataAccess;
+    using Microsoft.EntityFrameworkCore;
+    using MyChat.Server.Service;
+    using MyChat.Server.Repository;
 
     class Server
     {
         private TcpListener listener;
         private Dictionary<Guid, object?> clients;
         private ILogger logger;
-        private IConfiguration configuration;
+        private DbContextOptions<AppDbContext> dbContextOptions;
 
-        public Server(ILogger logger, IConfiguration configuration, string address, int port)
+        public Server(
+            ILogger logger, 
+            DbContextOptions<AppDbContext> dbContextOptions, 
+            string address, 
+            int port)
         {
+            Console.WriteLine("server nig");
             this.logger = logger;
-            this.configuration = configuration;
+            this.dbContextOptions = dbContextOptions;
             this.listener = new TcpListener(IPAddress.Parse(address), port);
             this.clients = new Dictionary<Guid, object?>();
         }
@@ -50,6 +58,7 @@
             var stream = client.TcpClient.GetStream();
             var reader = new StreamReader(stream, Encoding.UTF8);
             var writer = new StreamWriter(stream, Encoding.UTF8) { AutoFlush = true };
+            //UserService userService = new UserService(new UserRepository(this.dbContextOptions)); TODO
 
             try
             {
@@ -61,11 +70,11 @@
                     if (request is MessageRequest mr)
                     {
                         this.logger.LogInformation($"MessageRequest received from {client.GID}");
-                        //Console.WriteLine($"Message from {mr?.Sender} to {mr?.Receiver}: {mr?.Message}");
                         var response = new BaseReponse()
                         {
                             StatusCode = StatusCode.OK,
                         };
+                        
                         writer.WriteLine(JsonSerializer.Serialize(response));
                     }
                     else if (request is BaseRequest)

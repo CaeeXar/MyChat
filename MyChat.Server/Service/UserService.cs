@@ -7,9 +7,9 @@
 
     public class UserService
     {
-        private UserRepository userRepository;
+        private IUserRepository userRepository;
 
-        public UserService(UserRepository userRepository)
+        public UserService(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
         }

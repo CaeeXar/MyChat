@@ -1,27 +1,34 @@
 ﻿namespace MyChat.Server.Repository
 {
+    using Microsoft.EntityFrameworkCore;
     using MyChat.App.DataAccess;
     using MyChat.Core.Model;
 
     public class UserRepository : IUserRepository
     {
-        private AppDbContext context;
+        private DbContextOptions<AppDbContext> dbContextOptions;
 
-        public UserRepository(AppDbContext context)
+        public UserRepository(DbContextOptions<AppDbContext> dbContextOptions)
         {
-            this.context = context;
+            this.dbContextOptions = dbContextOptions;
         }
 
         public async Task<User> AddUserAsync(User user)
         {
-            this.context.Users.Add(user);
-            await this.context.SaveChangesAsync(); // should update user-reference object
-            return user;
+            using (var context = new AppDbContext(this.dbContextOptions))
+            {
+                context.Users.Add(user);
+                await context.SaveChangesAsync(); // should update user-reference object
+                return user;
+            }
         }
 
         public async Task<User?> GetUserByIdAsync(int id)
         {
-            return await this.context.Users.FindAsync(id); // FindAsync searches by PK
+            using (var context = new AppDbContext(this.dbContextOptions))
+            {
+                return await context.Users.FindAsync(id); // FindAsync searches by PK
+            }
         }
     }
 }

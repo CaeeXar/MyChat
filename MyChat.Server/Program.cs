@@ -1,7 +1,8 @@
 ﻿namespace MyChat.Server
 {
-    using Microsoft.Extensions.Configuration;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
+    using MyChat.App.DataAccess;
     using MyChat.Core;
 
     public class Program
@@ -11,16 +12,17 @@
             ILoggerFactory factory = LoggerFactory.Create(b => b.AddConsole());
             ILogger logger = factory.CreateLogger("Program");
 
-            IConfiguration configuration = new ConfigurationBuilder()
-                //.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
-                .Build();
+            var connectionString = AppSettings.GetConnectionString("MyChatDatabase");
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseNpgsql(connectionString);
+            var options = optionsBuilder.Options;
 
             Thread serverThread = new Thread(() =>
             {
                 Server server = new Server(
-                    logger, 
-                    configuration, 
+                    logger,
+                    options, 
                     Config.ServerIP, 
                     Config.ServerPort);
 
@@ -28,7 +30,6 @@
             });
 
             serverThread.Start();
-
 
             #region Test Client
             //Thread.Sleep(1000);
